@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 type Post = {
   id: string;
@@ -13,7 +14,7 @@ type Post = {
 
 const HomePage = () => {
   const [posts, setPosts] = useState<Post[]>([]);
-  const [editingPostId, setEditingPostId] = useState<string | null>(null);  // Track the post being edited
+  const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const router = useRouter();
@@ -109,10 +110,16 @@ const HomePage = () => {
                 </>
               ) : (
                 <>
-                  <h2 className="text-2xl font-bold mb-2">{post.title}</h2>
+                  <Link href={`/posts/${post.id}`}>
+                    <a className="text-2xl font-bold mb-2 text-blue-500 hover:underline">
+                      {post.title}
+                    </a>
+                  </Link>
                   <p className="text-gray-700 mb-4">{post.content}</p>
                   <p className="text-gray-500 text-sm">Posted by: {post.user_id}</p>
-                  <p className="text-gray-400 text-xs">Posted on: {new Date(post.created_at).toLocaleString()}</p>
+                  <p className="text-gray-400 text-xs">
+                    Posted on: {new Date(post.created_at).toLocaleString()}
+                  </p>
 
                   <div className="mt-4">
                     <button
@@ -143,4 +150,5 @@ const HomePage = () => {
 };
 
 export default HomePage;
+
 
