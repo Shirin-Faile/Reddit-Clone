@@ -1,7 +1,7 @@
 'use client'
-import { useEffect, useState } from 'react';
-import { Session } from '@supabase/supabase-js';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
+import { Session } from '@supabase/supabase-js'; 
 import { useRouter } from 'next/navigation';
 
 const CreatePost = () => {
@@ -14,7 +14,7 @@ const CreatePost = () => {
     const getSession = async () => {
       const { data } = await supabase.auth.getSession();
       if (!data.session) {
-        router.push('/login');
+        router.push('/auth/login');
       } else {
         setSession(data.session);
       }
@@ -29,9 +29,11 @@ const CreatePost = () => {
       return;
     }
 
+    const slug = title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+
     const { error } = await supabase
       .from('posts')
-      .insert([{ title, content, user_id: session?.user?.id }]);
+      .insert([{ title, content, slug, user_id: session?.user?.id }]);
 
     if (error) {
       console.error('Error creating post:', error.message);
@@ -44,23 +46,50 @@ const CreatePost = () => {
   if (!session) return <p>Loading...</p>;
 
   return (
-    <div>
-      <h1>Create a New Post</h1>
-      <input
-        type="text"
-        placeholder="Title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
-      <textarea
-        placeholder="Content"
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-      />
-      <button onClick={createPost}>Create Post</button>
+    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-2xl">
+        <h1 className="text-3xl font-bold mb-6 text-center">Create a New Post</h1>
+
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="title">
+            Post Title
+          </label>
+          <input
+            id="title"
+            type="text"
+            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Enter your post title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+        </div>
+
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="content">
+            Post Content
+          </label>
+          <textarea
+            id="content"
+            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Enter your post content"
+            rows={6}
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+          />
+        </div>
+
+        <button
+          onClick={createPost}
+          className="w-full bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 transition duration-200"
+        >
+          Create Post
+        </button>
+      </div>
     </div>
   );
 };
 
 export default CreatePost;
+
+
 
