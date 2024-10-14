@@ -1,3 +1,4 @@
+'use client'
 import { useEffect, useState } from 'react';
 import { Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabaseClient';
@@ -20,7 +21,7 @@ const CreatePost = () => {
     };
 
     getSession();
-  }, []);
+  }, [router]);
 
   const createPost = async () => {
     if (!title || !content) {
