@@ -14,6 +14,7 @@ type Post = {
 
 const HomePage = () => {
   const [posts, setPosts] = useState<Post[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -21,10 +22,17 @@ const HomePage = () => {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('posts')
         .select('*')
         .order('created_at', { ascending: false });
+
+      
+      if (searchTerm) {
+        query = query.ilike('title', `%${searchTerm}%`);
+      }
+
+      const { data, error } = await query;
 
       if (error) {
         console.error('Error fetching posts:', error.message);
@@ -34,7 +42,11 @@ const HomePage = () => {
     };
 
     fetchPosts();
-  }, []);
+  }, [searchTerm]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
 
   const updatePost = async (postId: string) => {
     if (!title || !content) {
@@ -51,8 +63,12 @@ const HomePage = () => {
       console.error('Error updating post:', error.message);
     } else {
       alert('Post updated successfully!');
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post.id === postId ? { ...post, title, content } : post
+        )
+      );
       setEditingPostId(null);
-      router.refresh();
     }
   };
 
@@ -73,6 +89,18 @@ const HomePage = () => {
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <h1 className="text-4xl font-bold mb-8 text-center">Posts</h1>
+
+      
+      <div className="max-w-md mx-auto mb-6">
+        <input
+          type="text"
+          placeholder="Search posts by title..."
+          className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          value={searchTerm}
+          onChange={handleSearchChange}
+        />
+      </div>
+
       {posts.length === 0 ? (
         <p className="text-center text-gray-500">No posts found.</p>
       ) : (
@@ -110,11 +138,13 @@ const HomePage = () => {
                 </>
               ) : (
                 <>
-                  <Link href={`/posts/${post.id}`}>
-                    <a className="text-2xl font-bold mb-2 text-blue-500 hover:underline">
-                      {post.title}
-                    </a>
+                  <Link
+                    href={`/posts/${post.id}`}
+                    className="text-2xl font-bold mb-2 text-blue-500 hover:underline"
+                  >
+                    {post.title}
                   </Link>
+
                   <p className="text-gray-700 mb-4">{post.content}</p>
                   <p className="text-gray-500 text-sm">Posted by: {post.user_id}</p>
                   <p className="text-gray-400 text-xs">
@@ -150,5 +180,6 @@ const HomePage = () => {
 };
 
 export default HomePage;
+
 
 
