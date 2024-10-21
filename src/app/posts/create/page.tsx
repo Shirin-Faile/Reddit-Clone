@@ -3,11 +3,13 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { Session } from '@supabase/supabase-js'; 
 import { useRouter } from 'next/navigation';
+import { v4 as uuidv4 } from 'uuid';
 
 const CreatePost = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [image, setImage] = useState<File | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -23,18 +25,58 @@ const CreatePost = () => {
     getSession();
   }, [router]);
 
+  const uploadImage = async () => {
+    if (!image) return '';
+
+    const fileName = `${uuidv4()}-${image.name}`;
+    const { data, error } = await supabase.storage
+      .from('post-images') // Your bucket name
+      .upload(fileName, image);
+
+    if (error) {
+      console.error('Error uploading image:', error.message);
+      return '';
+    }
+    
+    const imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/post-images/${fileName}`;
+    return imageUrl;
+  };
+
   const createPost = async () => {
     if (!title || !content) {
       alert('Please fill in both title and content');
       return;
     }
-
+  
+    let imageUrl = null;
+  
+    if (image) {
+      const fileExt = image.name.split('.').pop();
+      const fileName = `${uuidv4()}.${fileExt}`;
+      const { data, error: uploadError } = await supabase
+        .storage
+        .from('post-images')
+        .upload(`images/${fileName}`, image);
+  
+      if (uploadError) {
+        console.error('Error uploading image:', uploadError.message);
+        return;
+      }
+  
+      
+      imageUrl = supabase.storage.from('post-images').getPublicUrl(`images/${fileName}`).data.publicUrl;
+  
+    
+      console.log('Image URL:', imageUrl);
+    }
+  
+    
     const slug = title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
-
+  
     const { error } = await supabase
       .from('posts')
-      .insert([{ title, content, slug, user_id: session?.user?.id }]);
-
+      .insert([{ title, content, slug, image_url: imageUrl, user_id: session?.user?.id }]);
+  
     if (error) {
       console.error('Error creating post:', error.message);
     } else {
@@ -64,6 +106,21 @@ const CreatePost = () => {
           />
         </div>
 
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="image">
+            Upload Image
+          </label>
+          <input
+            id="image"
+            type="file"
+            className="w-full p-3 border rounded-lg"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) setImage(file);
+            }}
+          />
+        </div>
+
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="content">
             Post Content
@@ -90,6 +147,7 @@ const CreatePost = () => {
 };
 
 export default CreatePost;
+
 
 
 

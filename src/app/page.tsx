@@ -8,6 +8,7 @@ type Post = {
   id: string;
   title: string;
   content: string;
+  image_url: string | null;
   user_id: string;
   created_at: string;
 };
@@ -27,7 +28,6 @@ const HomePage = () => {
         .select('*')
         .order('created_at', { ascending: false });
 
-      
       if (searchTerm) {
         query = query.ilike('title', `%${searchTerm}%`);
       }
@@ -90,7 +90,6 @@ const HomePage = () => {
     <div className="min-h-screen bg-gray-100 p-8">
       <h1 className="text-4xl font-bold mb-8 text-center">Posts</h1>
 
-      
       <div className="max-w-md mx-auto mb-6">
         <input
           type="text"
@@ -145,6 +144,15 @@ const HomePage = () => {
                     {post.title}
                   </Link>
 
+                  
+                  {post.image_url && (
+                    <img
+                      src={post.image_url}
+                      alt={post.title}
+                      className="mb-4 rounded-lg shadow-md"
+                    />
+                  )}
+
                   <p className="text-gray-700 mb-4">{post.content}</p>
                   <p className="text-gray-500 text-sm">Posted by: {post.user_id}</p>
                   <p className="text-gray-400 text-xs">
@@ -180,6 +188,7 @@ const HomePage = () => {
 };
 
 export default HomePage;
+
 
 
 
