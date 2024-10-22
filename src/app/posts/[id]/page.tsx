@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { Session } from '@supabase/supabase-js';
+import { useRouter } from 'next/navigation';
 
 interface Params {
   id: string;
@@ -33,6 +34,7 @@ const PostPage = ({ params }: { params: Params }) => {
   const [replyContent, setReplyContent] = useState('');
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     fetchPost();
@@ -115,11 +117,41 @@ const PostPage = ({ params }: { params: Params }) => {
       return comments
         .filter((comment) => comment.parent_id === parentId)
         .map((nestedComment) => (
-          <div key={nestedComment.id} className="ml-6 pl-4 border-l">
-            <p>{nestedComment.content}</p>
-            <p>Posted by user {nestedComment.user_id}</p>
-            <p>{new Date(nestedComment.created_at).toLocaleString()}</p>
-            <button onClick={() => setReplyingTo(nestedComment.id)} className="text-blue-500 hover:underline">Reply</button>
+          <div key={nestedComment.id} className="ml-6 mt-2">
+            <div className="bg-gray-800 p-3 rounded-lg">
+              <p className="text-gray-300">{nestedComment.content}</p>
+              <p className="text-gray-500 text-sm">Posted by user {nestedComment.user_id}</p>
+              <p className="text-gray-600 text-xs">{new Date(nestedComment.created_at).toLocaleString()}</p>
+              <button
+                onClick={() => setReplyingTo(nestedComment.id)}
+                className="text-pink-400 hover:underline mt-2"
+              >
+                Reply
+              </button>
+            </div>
+            {replyingTo === nestedComment.id && (
+              <div className="mt-2 ml-6">
+                <textarea
+                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-gray-700 text-white"
+                  placeholder="Add your reply..."
+                  rows={2}
+                  value={replyContent}
+                  onChange={(e) => setReplyContent(e.target.value)}
+                />
+                <button
+                  onClick={() => addReply(nestedComment.id)}
+                  className="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 mt-2"
+                >
+                  Submit Reply
+                </button>
+                <button
+                  onClick={() => setReplyingTo(null)}
+                  className="ml-2 text-red-400 hover:underline"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
             {renderNestedComments(nestedComment.id)}
           </div>
         ));
@@ -129,10 +161,40 @@ const PostPage = ({ params }: { params: Params }) => {
       .filter((comment) => !comment.parent_id)
       .map((comment) => (
         <div key={comment.id} className="mb-4">
-          <p>{comment.content}</p>
-          <p>Posted by user {comment.user_id}</p>
-          <p>{new Date(comment.created_at).toLocaleString()}</p>
-          <button onClick={() => setReplyingTo(comment.id)} className="text-blue-500 hover:underline">Reply</button>
+          <div className="bg-gray-800 p-4 rounded-lg">
+            <p className="text-gray-300">{comment.content}</p>
+            <p className="text-gray-500 text-sm">Posted by user {comment.user_id}</p>
+            <p className="text-gray-600 text-xs">{new Date(comment.created_at).toLocaleString()}</p>
+            <button
+              onClick={() => setReplyingTo(comment.id)}
+              className="text-pink-400 hover:underline mt-2"
+            >
+              Reply
+            </button>
+          </div>
+          {replyingTo === comment.id && (
+            <div className="mt-2 ml-6">
+              <textarea
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-gray-700 text-white"
+                placeholder="Add your reply..."
+                rows={2}
+                value={replyContent}
+                onChange={(e) => setReplyContent(e.target.value)}
+              />
+              <button
+                onClick={() => addReply(comment.id)}
+                className="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 mt-2"
+              >
+                Submit Reply
+              </button>
+              <button
+                onClick={() => setReplyingTo(null)}
+                className="ml-2 text-red-400 hover:underline"
+              >
+                Cancel
+              </button>
+            </div>
+          )}
           {renderNestedComments(comment.id)}
         </div>
       ));
@@ -141,78 +203,70 @@ const PostPage = ({ params }: { params: Params }) => {
   if (!post) return <p>Loading post...</p>;
 
   return (
-    <div className="max-w-4xl mx-auto p-8">
-      <h1 className="text-4xl font-bold mb-6">{post.title}</h1>
-      
-      
-      {post.image_url && (
-        <img
-          src={post.image_url}
-          alt={post.title}
-          className="mb-4 rounded-lg shadow-md"
-        />
-      )}
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black p-8 text-white">
+      <div className="max-w-4xl mx-auto">
+        {/* Back to Homepage Button */}
+        <button
+          onClick={() => router.push('/')}
+          className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg mb-6"
+        >
+          ← Back to Homepage
+        </button>
 
-      <p className="text-gray-700 mb-4">{post.content}</p>
-      <p className="text-gray-500 text-sm">Posted by: {post.user_id}</p>
-      <p className="text-gray-400 text-xs">Posted on: {new Date(post.created_at).toLocaleString()}</p>
+        <h1 className="text-4xl font-bold mb-6 text-pink-400">{post.title}</h1>
 
-      <hr className="my-8" />
-
-      <div>
-        <h2 className="text-2xl font-bold mb-4">Comments</h2>
-        {comments.length === 0 ? (
-          <p className="text-gray-500">No comments yet.</p>
-        ) : (
-          <div className="space-y-4">{renderComments(comments)}</div>
-        )}
-      </div>
-
-      {session ? (
-        <div className="mt-8">
-          <textarea
-            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Add your comment..."
-            rows={4}
-            value={commentContent}
-            onChange={(e) => setCommentContent(e.target.value)}
+        {post.image_url && (
+          <img
+            src={post.image_url}
+            alt={post.title}
+            className="mb-4 rounded-lg shadow-md"
           />
-          <button
-            onClick={addComment}
-            className="bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 mt-4 w-full"
-          >
-            Submit Comment
-          </button>
+        )}
 
-          {replyingTo && (
-            <div className="mt-4">
-              <textarea
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                placeholder="Add your reply..."
-                rows={4}
-                value={replyContent}
-                onChange={(e) => setReplyContent(e.target.value)}
-              />
-              <button
-                onClick={() => addReply(replyingTo)}
-                className="bg-green-500 text-white p-3 rounded-lg hover:bg-green-600 mt-4 w-full"
-              >
-                Submit Reply
-              </button>
-              <button onClick={() => setReplyingTo(null)} className="mt-2 text-red-500">
-                Cancel Reply
-              </button>
-            </div>
+        <p className="text-gray-300 mb-4">{post.content}</p>
+        <p className="text-gray-500 text-sm">Posted by: {post.user_id}</p>
+        <p className="text-gray-600 text-xs">Posted on: {new Date(post.created_at).toLocaleString()}</p>
+
+        <hr className="my-8 border-gray-700" />
+
+        <div>
+          <h2 className="text-2xl font-bold mb-4 text-pink-400">Comments</h2>
+          {comments.length === 0 ? (
+            <p className="text-gray-500">No comments yet.</p>
+          ) : (
+            <div className="space-y-4">{renderComments(comments)}</div>
           )}
         </div>
-      ) : (
-        <p className="text-gray-500 mt-8">You must be logged in to comment.</p>
-      )}
+
+        {session ? (
+          <div className="mt-8">
+            <textarea
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 bg-gray-800 text-white mb-4"
+              placeholder="Add your comment..."
+              rows={4}
+              value={commentContent}
+              onChange={(e) => setCommentContent(e.target.value)}
+            />
+            <button
+              onClick={addComment}
+              className="bg-pink-500 text-white p-3 rounded-lg hover:bg-pink-600 mt-4 w-full"
+            >
+              Submit Comment
+            </button>
+          </div>
+        ) : (
+          <p className="text-gray-500 mt-8">You must be logged in to comment.</p>
+        )}
+      </div>
     </div>
   );
 };
 
 export default PostPage;
+
+
+
+
 
 
 

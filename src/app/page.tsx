@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
@@ -87,25 +87,25 @@ const HomePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <h1 className="text-4xl font-bold mb-8 text-center">Posts</h1>
-
+    <div className="min-h-screen bg-gradient-to-b from-indigo-900 to-purple-900 p-8">
+      <h1 className="text-4xl font-bold mb-8 text-center text-white">Posts</h1>
+  
       <div className="max-w-md mx-auto mb-6">
         <input
           type="text"
           placeholder="Search posts by title..."
-          className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 bg-gray-800 text-white"
           value={searchTerm}
           onChange={handleSearchChange}
         />
       </div>
-
+  
       {posts.length === 0 ? (
-        <p className="text-center text-gray-500">No posts found.</p>
+        <p className="text-center text-gray-400">No posts found.</p>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-6 max-w-3xl mx-auto">
           {posts.map((post) => (
-            <div key={post.id} className="bg-white p-6 rounded-lg shadow-md">
+            <div key={post.id} className="bg-gray-800 p-6 rounded-lg shadow-md">
               {editingPostId === post.id ? (
                 <>
                   <input
@@ -113,13 +113,13 @@ const HomePage = () => {
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="Post Title"
-                    className="w-full p-2 border rounded mb-4"
+                    className="w-full p-2 border rounded mb-4 bg-gray-700 text-white"
                   />
                   <textarea
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
                     placeholder="Post Content"
-                    className="w-full p-2 border rounded mb-4"
+                    className="w-full p-2 border rounded mb-4 bg-gray-700 text-white"
                     rows={4}
                   />
                   <button
@@ -139,26 +139,25 @@ const HomePage = () => {
                 <>
                   <Link
                     href={`/posts/${post.id}`}
-                    className="text-2xl font-bold mb-2 text-blue-500 hover:underline"
+                    className="text-2xl font-bold mb-2 text-pink-400 hover:underline"
                   >
                     {post.title}
                   </Link>
-
-                  
+  
                   {post.image_url && (
                     <img
                       src={post.image_url}
                       alt={post.title}
-                      className="mb-4 rounded-lg shadow-md"
+                      className="mb-4 rounded-lg shadow-md w-full max-h-96 object-cover"
                     />
                   )}
-
-                  <p className="text-gray-700 mb-4">{post.content}</p>
-                  <p className="text-gray-500 text-sm">Posted by: {post.user_id}</p>
-                  <p className="text-gray-400 text-xs">
+  
+                  <p className="text-gray-300 mb-4">{post.content}</p>
+                  <p className="text-gray-400 text-sm">Posted by: {post.user_id}</p>
+                  <p className="text-gray-500 text-xs">
                     Posted on: {new Date(post.created_at).toLocaleString()}
                   </p>
-
+  
                   <div className="mt-4">
                     <button
                       onClick={() => {
@@ -184,10 +183,15 @@ const HomePage = () => {
         </div>
       )}
     </div>
-  );
+  );  
 };
 
 export default HomePage;
+
+
+
+
+
 
 
 

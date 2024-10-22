@@ -23,26 +23,31 @@ const Signup = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <h1 className="text-3xl font-bold mb-6">Sign Up</h1>
-      <div className="bg-white p-6 rounded shadow-md w-full max-w-md">
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="email">Email</label>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 relative overflow-hidden">
+      {/* Floating Shapes for Playfulness */}
+      <div className="absolute -top-20 -left-16 w-96 h-96 bg-pink-300 rounded-full opacity-30 animate-pulse"></div>
+      <div className="absolute -bottom-16 -right-16 w-80 h-80 bg-blue-400 rounded-full opacity-30 animate-pulse"></div>
+
+      <h1 className="text-5xl font-bold text-white mb-6">Sign Up</h1>
+
+      <div className="bg-white p-8 rounded-3xl shadow-lg w-full max-w-md">
+        <div className="mb-6">
+          <label className="block text-lg font-semibold text-gray-700 mb-2" htmlFor="email">Email</label>
           <input
             id="email"
             type="email"
-            className="w-full p-2 border rounded"
+            className="w-full p-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-300"
             placeholder="Enter your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="password">Password</label>
+          <label className="block text-lg font-semibold text-gray-700 mb-2" htmlFor="password">Password</label>
           <input
             id="password"
             type="password"
-            className="w-full p-2 border rounded"
+            className="w-full p-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-300"
             placeholder="Enter your password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -50,12 +55,12 @@ const Signup = () => {
         </div>
         <button
           onClick={handleSignup}
-          className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+          className="w-full bg-purple-600 text-white p-3 rounded-full shadow-lg hover:bg-purple-700 transition-transform transform hover:scale-105"
         >
           Sign Up
         </button>
-        <div className="text-center mt-4">
-          <p>Are you already a member? <Link href="/auth/login" className="text-blue-500">Then sign in here</Link></p>
+        <div className="text-center mt-4 text-white">
+          <p>Already a member? <Link href="/auth/login" className="text-yellow-300 font-bold underline">Sign in here</Link></p>
         </div>
       </div>
     </div>
@@ -63,3 +68,4 @@ const Signup = () => {
 };
 
 export default Signup;
+
