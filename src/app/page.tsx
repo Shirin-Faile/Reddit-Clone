@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
+import { Session } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -16,11 +17,26 @@ type Post = {
 const HomePage = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [session, setSession] = useState<Session | null>(null);
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const router = useRouter();
 
+  
+  useEffect(() => {
+    const getSession = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (!data.session) {
+        router.push('/auth/login');
+      } else {
+        setSession(data.session);
+      }
+    };
+    getSession();
+  }, [router]);
+
+  
   useEffect(() => {
     const fetchPosts = async () => {
       let query = supabase
@@ -41,14 +57,17 @@ const HomePage = () => {
       }
     };
 
-    fetchPosts();
-  }, [searchTerm]);
+    if (session) {
+      fetchPosts();
+    }
+  }, [searchTerm, session]);
 
+  
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
 
-  // Update post function
+  
   const updatePost = async (postId: string) => {
     if (!title || !content) {
       alert('Please fill in both title and content');
@@ -69,11 +88,11 @@ const HomePage = () => {
           post.id === postId ? { ...post, title, content } : post
         )
       );
-      setEditingPostId(null); // Exit edit mode
+      setEditingPostId(null);
     }
   };
 
-  // Delete post function
+  
   const deletePost = async (postId: string) => {
     const { error } = await supabase
       .from('posts')
@@ -83,16 +102,18 @@ const HomePage = () => {
     if (error) {
       console.error('Error deleting post:', error.message);
     } else {
-      // Filter the deleted post out of the local state
       setPosts(posts.filter((post) => post.id !== postId));
     }
   };
+
+  
+  if (!session) return <p>Loading...</p>;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-900 to-purple-900 p-8">
       <h1 className="text-4xl font-bold mb-8 text-center text-white">Posts</h1>
 
-      {/* Create new post button */}
+      
       <div className="flex justify-center mb-8">
         <button
           onClick={() => router.push('/posts/create')}
@@ -102,7 +123,7 @@ const HomePage = () => {
         </button>
       </div>
 
-      {/* Search input */}
+      
       <div className="max-w-md mx-auto mb-6">
         <input
           type="text"
@@ -113,6 +134,7 @@ const HomePage = () => {
         />
       </div>
 
+      
       {posts.length === 0 ? (
         <p className="text-center text-gray-400">No posts found.</p>
       ) : (
@@ -121,7 +143,7 @@ const HomePage = () => {
             <div key={post.id} className="bg-gray-800 p-6 rounded-lg shadow-md">
               {editingPostId === post.id ? (
                 <>
-                  {/* Editing mode */}
+                  
                   <input
                     type="text"
                     value={title}
@@ -151,7 +173,7 @@ const HomePage = () => {
                 </>
               ) : (
                 <>
-                  {/* Display mode */}
+                  
                   <Link
                     href={`/posts/${post.id}`}
                     className="text-2xl font-bold mb-2 text-pink-400 hover:underline"
@@ -173,7 +195,7 @@ const HomePage = () => {
                     Posted on: {new Date(post.created_at).toLocaleString()}
                   </p>
 
-                  {/* Edit and Delete buttons */}
+                  
                   <div className="mt-4">
                     <button
                       onClick={() => {
@@ -201,8 +223,9 @@ const HomePage = () => {
     </div>
   );
 };
-
 export default HomePage;
+
+
 
 
 
