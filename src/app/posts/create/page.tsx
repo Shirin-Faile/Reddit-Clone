@@ -83,7 +83,17 @@ const CreatePost = () => {
   if (!session) return <p>Loading...</p>;
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gradient-to-b from-indigo-900 to-purple-900 p-6">
+    <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-b from-indigo-900 to-purple-900 p-6">
+      
+      {/* Back to homepage button */}
+      <button
+        onClick={() => router.push('/')}
+        className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg mb-6"
+      >
+        ← Back to Homepage
+      </button>
+
+      {/* Post creation form */}
       <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-2xl text-white">
         <h1 className="text-4xl font-bold mb-6 text-center">Create a New Post</h1>
 
@@ -142,6 +152,7 @@ const CreatePost = () => {
 };
 
 export default CreatePost;
+
 
 
 

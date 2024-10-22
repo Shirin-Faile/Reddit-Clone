@@ -17,7 +17,7 @@ const Login = () => {
     if (error) {
       console.error('Error logging in:', error.message);
     } else {
-      router.push('/posts/create');
+      router.push('/');
     }
   };
 

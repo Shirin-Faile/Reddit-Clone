@@ -205,7 +205,7 @@ const PostPage = ({ params }: { params: Params }) => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black p-8 text-white">
       <div className="max-w-4xl mx-auto">
-        {/* Back to Homepage Button */}
+
         <button
           onClick={() => router.push('/')}
           className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg mb-6"
