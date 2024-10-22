@@ -112,6 +112,19 @@ const PostPage = ({ params }: { params: Params }) => {
     }
   };
 
+  const deleteComment = async (commentId: string) => {
+    const { error } = await supabase
+      .from('comments')
+      .delete()
+      .eq('id', commentId);
+
+    if (error) {
+      console.error('Error deleting comment:', error.message);
+    } else {
+      setComments(comments.filter((comment) => comment.id !== commentId));
+    }
+  };
+
   const renderComments = (comments: Comment[]) => {
     const renderNestedComments = (parentId: string) => {
       return comments
@@ -127,6 +140,12 @@ const PostPage = ({ params }: { params: Params }) => {
                 className="text-pink-400 hover:underline mt-2"
               >
                 Reply
+              </button>
+              <button
+                onClick={() => deleteComment(nestedComment.id)}
+                className="ml-2 text-red-400 hover:underline"
+              >
+                Delete
               </button>
             </div>
             {replyingTo === nestedComment.id && (
@@ -170,6 +189,12 @@ const PostPage = ({ params }: { params: Params }) => {
               className="text-pink-400 hover:underline mt-2"
             >
               Reply
+            </button>
+            <button
+              onClick={() => deleteComment(comment.id)}
+              className="ml-2 text-red-400 hover:underline"
+            >
+              Delete
             </button>
           </div>
           {replyingTo === comment.id && (
@@ -263,6 +288,7 @@ const PostPage = ({ params }: { params: Params }) => {
 };
 
 export default PostPage;
+
 
 
 
