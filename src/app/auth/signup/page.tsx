@@ -1,8 +1,9 @@
-'use client'
+'use client';
 import { useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import toast from 'react-hot-toast';
 
 const Signup = () => {
   const [email, setEmail] = useState('');
@@ -14,17 +15,23 @@ const Signup = () => {
       email,
       password,
     });
+
     if (error) {
+      if (error.message.includes('already registered')) {
+        toast.error('This email is already registered. Please log in.');
+      } else {
+        toast.error('Error signing up. Please try again.');
+      }
       console.error('Error signing up:', error.message);
     } else {
-      alert('Signup successful! Please log in.');
+      toast.success('Signup successful! Please check your email to confirm your account.');
       router.push('/auth/login');
     }
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 relative overflow-hidden">
-      {/* Floating Shapes for Playfulness */}
+      
       <div className="absolute -top-20 -left-16 w-96 h-96 bg-pink-300 rounded-full opacity-30 animate-pulse"></div>
       <div className="absolute -bottom-16 -right-16 w-80 h-80 bg-blue-400 rounded-full opacity-30 animate-pulse"></div>
 

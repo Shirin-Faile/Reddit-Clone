@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { Session } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
 interface Params {
   id: string;
@@ -51,6 +52,7 @@ const PostPage = ({ params }: { params: Params }) => {
 
     if (error) {
       console.error('Error fetching post:', error.message);
+      toast.error('Failed to load post. Please try again.');
     } else {
       setPost(data);
     }
@@ -65,6 +67,7 @@ const PostPage = ({ params }: { params: Params }) => {
 
     if (error) {
       console.error('Error fetching comments:', error.message);
+      toast.error('Failed to load comments. Please try again.');
     } else {
       setComments(data || []);
     }
@@ -77,7 +80,7 @@ const PostPage = ({ params }: { params: Params }) => {
 
   const addComment = async () => {
     if (!commentContent) {
-      alert('Please enter a comment');
+      toast.error('Please enter a comment.');
       return;
     }
 
@@ -87,7 +90,9 @@ const PostPage = ({ params }: { params: Params }) => {
 
     if (error) {
       console.error('Error adding comment:', error.message);
+      toast.error('Failed to add comment. Please try again.');
     } else {
+      toast.success('Comment added successfully!');
       setCommentContent('');
       fetchComments();
     }
@@ -95,7 +100,7 @@ const PostPage = ({ params }: { params: Params }) => {
 
   const addReply = async (parentCommentId: string) => {
     if (!replyContent) {
-      alert('Please enter a reply');
+      toast.error('Please enter a reply.');
       return;
     }
 
@@ -105,7 +110,9 @@ const PostPage = ({ params }: { params: Params }) => {
 
     if (error) {
       console.error('Error adding reply:', error.message);
+      toast.error('Failed to add reply. Please try again.');
     } else {
+      toast.success('Reply added successfully!');
       setReplyContent('');
       setReplyingTo(null);
       fetchComments();
@@ -120,7 +127,9 @@ const PostPage = ({ params }: { params: Params }) => {
 
     if (error) {
       console.error('Error deleting comment:', error.message);
+      toast.error('Failed to delete comment. Please try again.');
     } else {
+      toast.success('Comment deleted successfully!');
       setComments(comments.filter((comment) => comment.id !== commentId));
     }
   };
@@ -230,16 +239,13 @@ const PostPage = ({ params }: { params: Params }) => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black p-8 text-white">
       <div className="max-w-4xl mx-auto">
-
         <button
           onClick={() => router.push('/')}
           className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg mb-6"
         >
           ← Back to Homepage
         </button>
-
         <h1 className="text-4xl font-bold mb-6 text-pink-400">{post.title}</h1>
-
         {post.image_url && (
           <img
             src={post.image_url}
@@ -247,13 +253,10 @@ const PostPage = ({ params }: { params: Params }) => {
             className="mb-4 rounded-lg shadow-md"
           />
         )}
-
         <p className="text-gray-300 mb-4">{post.content}</p>
         <p className="text-gray-500 text-sm">Posted by: {post.user_id}</p>
         <p className="text-gray-600 text-xs">Posted on: {new Date(post.created_at).toLocaleString()}</p>
-
         <hr className="my-8 border-gray-700" />
-
         <div>
           <h2 className="text-2xl font-bold mb-4 text-pink-400">Comments</h2>
           {comments.length === 0 ? (
@@ -262,7 +265,6 @@ const PostPage = ({ params }: { params: Params }) => {
             <div className="space-y-4">{renderComments(comments)}</div>
           )}
         </div>
-
         {session ? (
           <div className="mt-8">
             <textarea
@@ -288,12 +290,3 @@ const PostPage = ({ params }: { params: Params }) => {
 };
 
 export default PostPage;
-
-
-
-
-
-
-
-
-

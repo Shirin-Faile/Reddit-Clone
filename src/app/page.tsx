@@ -23,10 +23,9 @@ const HomePage = () => {
   const [content, setContent] = useState('');
   const router = useRouter();
 
-  
   useEffect(() => {
     const getSession = async () => {
-      const { data, error } = await supabase.auth.getSession();
+      const { data } = await supabase.auth.getSession();
       if (!data.session) {
         router.push('/auth/login');
       } else {
@@ -36,7 +35,6 @@ const HomePage = () => {
     getSession();
   }, [router]);
 
-  
   useEffect(() => {
     const fetchPosts = async () => {
       let query = supabase
@@ -53,7 +51,7 @@ const HomePage = () => {
       if (error) {
         console.error('Error fetching posts:', error.message);
       } else {
-        setPosts(data);
+        setPosts(data || []);
       }
     };
 
@@ -62,12 +60,19 @@ const HomePage = () => {
     }
   }, [searchTerm, session]);
 
-  
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
 
-  
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('Logout failed:', error.message);
+    } else {
+      router.push('/auth/login');
+    }
+  };
+
   const updatePost = async (postId: string) => {
     if (!title || !content) {
       alert('Please fill in both title and content');
@@ -92,7 +97,6 @@ const HomePage = () => {
     }
   };
 
-  
   const deletePost = async (postId: string) => {
     const { error } = await supabase
       .from('posts')
@@ -106,14 +110,24 @@ const HomePage = () => {
     }
   };
 
-  
   if (!session) return <p>Loading...</p>;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-900 to-purple-900 p-8">
-      <h1 className="text-4xl font-bold mb-8 text-center text-white">Posts</h1>
+      
+      <header className="flex justify-between items-center mb-8">
+        <h1 className="text-4xl font-bold text-white">Reddit Clone</h1>
+        <button
+          onClick={handleLogout}
+          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
+        >
+          Logout
+        </button>
+      </header>
 
       
+      <h1 className="text-4xl font-bold mb-8 text-center text-white">Posts</h1>
+
       <div className="flex justify-center mb-8">
         <button
           onClick={() => router.push('/posts/create')}
@@ -123,7 +137,6 @@ const HomePage = () => {
         </button>
       </div>
 
-      
       <div className="max-w-md mx-auto mb-6">
         <input
           type="text"
@@ -134,7 +147,6 @@ const HomePage = () => {
         />
       </div>
 
-      
       {posts.length === 0 ? (
         <p className="text-center text-gray-400">No posts found.</p>
       ) : (
@@ -143,7 +155,6 @@ const HomePage = () => {
             <div key={post.id} className="bg-gray-800 p-6 rounded-lg shadow-md">
               {editingPostId === post.id ? (
                 <>
-                  
                   <input
                     type="text"
                     value={title}
@@ -173,7 +184,6 @@ const HomePage = () => {
                 </>
               ) : (
                 <>
-                  
                   <Link
                     href={`/posts/${post.id}`}
                     className="text-2xl font-bold mb-2 text-pink-400 hover:underline"
@@ -195,7 +205,6 @@ const HomePage = () => {
                     Posted on: {new Date(post.created_at).toLocaleString()}
                   </p>
 
-                  
                   <div className="mt-4">
                     <button
                       onClick={() => {
@@ -223,18 +232,5 @@ const HomePage = () => {
     </div>
   );
 };
+
 export default HomePage;
-
-
-
-
-
-
-
-
-
-
-
-
-
-

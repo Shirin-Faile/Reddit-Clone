@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabaseClient';
 import { Session } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
 import { v4 as uuidv4 } from 'uuid';
+import toast from 'react-hot-toast'; // Import the toast library
 
 const CreatePost = () => {
   const [session, setSession] = useState<Session | null>(null);
@@ -26,16 +27,15 @@ const CreatePost = () => {
   }, [router]);
 
   const uploadImage = async () => {
-    if (!image) return '';
+    if (!image) return null;
 
     const fileName = `${uuidv4()}-${image.name}`;
-    const { data, error } = await supabase.storage
-      .from('post-images')
-      .upload(fileName, image);
+    const { error } = await supabase.storage.from('post-images').upload(fileName, image);
 
     if (error) {
       console.error('Error uploading image:', error.message);
-      return '';
+      toast.error('Failed to upload image. Please try again.');
+      return null;
     }
 
     const imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/post-images/${fileName}`;
@@ -44,38 +44,27 @@ const CreatePost = () => {
 
   const createPost = async () => {
     if (!title || !content) {
-      alert('Please fill in both title and content');
+      toast.error('Please fill in both title and content.');
       return;
     }
 
     let imageUrl = null;
 
     if (image) {
-      const fileExt = image.name.split('.').pop();
-      const fileName = `${uuidv4()}.${fileExt}`;
-      const { data, error: uploadError } = await supabase
-        .storage
-        .from('post-images')
-        .upload(`images/${fileName}`, image);
-
-      if (uploadError) {
-        console.error('Error uploading image:', uploadError.message);
-        return;
-      }
-
-      imageUrl = supabase.storage.from('post-images').getPublicUrl(`images/${fileName}`).data.publicUrl;
+      imageUrl = await uploadImage();
+      if (!imageUrl) return; // Stop if the image upload failed
     }
 
     const slug = title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
-
     const { error } = await supabase
       .from('posts')
       .insert([{ title, content, slug, image_url: imageUrl, user_id: session?.user?.id }]);
 
     if (error) {
       console.error('Error creating post:', error.message);
+      toast.error('Failed to create post. Please try again.');
     } else {
-      alert('Post created successfully!');
+      toast.success('Post created successfully!');
       router.push('/');
     }
   };
@@ -84,7 +73,6 @@ const CreatePost = () => {
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-b from-indigo-900 to-purple-900 p-6">
-      
       {/* Back to homepage button */}
       <button
         onClick={() => router.push('/')}
@@ -152,11 +140,3 @@ const CreatePost = () => {
 };
 
 export default CreatePost;
-
-
-
-
-
-
-
-

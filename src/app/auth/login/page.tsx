@@ -1,8 +1,9 @@
-'use client'
+'use client';
 import { useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import toast from 'react-hot-toast';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -14,9 +15,17 @@ const Login = () => {
       email,
       password,
     });
+
     if (error) {
-      console.error('Error logging in:', error.message);
+      if (error.message === 'Invalid login credentials') {
+        toast.error('Invalid email or password');
+      } else if (error.message === 'Email not confirmed') {
+        toast.error('Please confirm your email before logging in');
+      } else {
+        toast.error('Something went wrong. Please try again.');
+      }
     } else {
+      toast.success('Login successful! Redirecting...');
       router.push('/');
     }
   };
