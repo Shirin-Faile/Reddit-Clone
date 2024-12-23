@@ -30,16 +30,15 @@ const Signup = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 relative overflow-hidden">
-      
-      <div className="absolute -top-20 -left-16 w-96 h-96 bg-pink-300 rounded-full opacity-30 animate-pulse"></div>
-      <div className="absolute -bottom-16 -right-16 w-80 h-80 bg-blue-400 rounded-full opacity-30 animate-pulse"></div>
-
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500">
+      {/* Content */}
       <h1 className="text-5xl font-bold text-white mb-6">Sign Up</h1>
-
+  
       <div className="bg-white p-8 rounded-3xl shadow-lg w-full max-w-md">
         <div className="mb-6">
-          <label className="block text-lg font-semibold text-gray-700 mb-2" htmlFor="email">Email</label>
+          <label className="block text-lg font-semibold text-gray-700 mb-2" htmlFor="email">
+            Email
+          </label>
           <input
             id="email"
             type="email"
@@ -50,7 +49,9 @@ const Signup = () => {
           />
         </div>
         <div className="mb-6">
-          <label className="block text-lg font-semibold text-gray-700 mb-2" htmlFor="password">Password</label>
+          <label className="block text-lg font-semibold text-gray-700 mb-2" htmlFor="password">
+            Password
+          </label>
           <input
             id="password"
             type="password"
@@ -67,11 +68,16 @@ const Signup = () => {
           Sign Up
         </button>
         <div className="text-center mt-4 text-white">
-          <p>Already a member? <Link href="/auth/login" className="text-yellow-300 font-bold underline">Sign in here</Link></p>
+          <p>
+            Already a member?{' '}
+            <Link href="/auth/login" className="text-yellow-300 font-bold underline">
+              Sign in here
+            </Link>
+          </p>
         </div>
       </div>
     </div>
-  );
+  );  
 };
 
 export default Signup;

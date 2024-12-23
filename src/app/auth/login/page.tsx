@@ -31,15 +31,15 @@ const Login = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 relative overflow-hidden">
-      <div className="absolute -top-16 -left-20 w-96 h-96 bg-purple-300 rounded-full opacity-20 animate-pulse"></div>
-      <div className="absolute -bottom-20 -right-10 w-80 h-80 bg-yellow-400 rounded-full opacity-20 animate-pulse"></div>
-
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500">
+      
       <h1 className="text-5xl font-bold text-white mb-6">Login</h1>
-
+  
       <div className="bg-white p-8 rounded-3xl shadow-lg w-full max-w-md">
         <div className="mb-6">
-          <label className="block text-lg font-semibold text-gray-700 mb-2" htmlFor="email">Email</label>
+          <label className="block text-lg font-semibold text-gray-700 mb-2" htmlFor="email">
+            Email
+          </label>
           <input
             id="email"
             type="email"
@@ -50,7 +50,9 @@ const Login = () => {
           />
         </div>
         <div className="mb-6">
-          <label className="block text-lg font-semibold text-gray-700 mb-2" htmlFor="password">Password</label>
+          <label className="block text-lg font-semibold text-gray-700 mb-2" htmlFor="password">
+            Password
+          </label>
           <input
             id="password"
             type="password"
@@ -67,11 +69,16 @@ const Login = () => {
           Login
         </button>
         <div className="text-center mt-4 text-white">
-          <p>Don't have an account? <Link href="/auth/signup" className="text-yellow-300 font-bold underline">Sign up here</Link></p>
+          <p>
+            Don't have an account?{' '}
+            <Link href="/auth/signup" className="text-yellow-300 font-bold underline">
+              Sign up here
+            </Link>
+          </p>
         </div>
       </div>
     </div>
-  );
+  );  
 };
 
 export default Login;

@@ -205,24 +205,27 @@ const HomePage = () => {
                     Posted on: {new Date(post.created_at).toLocaleString()}
                   </p>
 
-                  <div className="mt-4">
-                    <button
-                      onClick={() => {
-                        setEditingPostId(post.id);
-                        setTitle(post.title);
-                        setContent(post.content);
-                      }}
-                      className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 mr-2"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => deletePost(post.id)}
-                      className="bg-red-500 text-white p-2 rounded hover:bg-red-600"
-                    >
-                      Delete
-                    </button>
-                  </div>
+                  {/* Restrict Edit/Delete buttons to the post owner */}
+                  {post.user_id === session?.user?.id && (
+                    <div className="mt-4">
+                      <button
+                        onClick={() => {
+                          setEditingPostId(post.id);
+                          setTitle(post.title);
+                          setContent(post.content);
+                        }}
+                        className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 mr-2"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => deletePost(post.id)}
+                        className="bg-red-500 text-white p-2 rounded hover:bg-red-600"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  )}
                 </>
               )}
             </div>

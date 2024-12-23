@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabaseClient';
 import { Session } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
 import { v4 as uuidv4 } from 'uuid';
-import toast from 'react-hot-toast'; // Import the toast library
+import toast from 'react-hot-toast';
 
 const CreatePost = () => {
   const [session, setSession] = useState<Session | null>(null);
@@ -52,7 +52,7 @@ const CreatePost = () => {
 
     if (image) {
       imageUrl = await uploadImage();
-      if (!imageUrl) return; // Stop if the image upload failed
+      if (!imageUrl) return;
     }
 
     const slug = title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');

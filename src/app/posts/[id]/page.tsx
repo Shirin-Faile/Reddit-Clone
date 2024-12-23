@@ -150,12 +150,14 @@ const PostPage = ({ params }: { params: Params }) => {
               >
                 Reply
               </button>
-              <button
-                onClick={() => deleteComment(nestedComment.id)}
-                className="ml-2 text-red-400 hover:underline"
-              >
-                Delete
-              </button>
+              {session?.user?.id === nestedComment.user_id || session?.user?.id === post?.user_id ? (
+                <button
+                  onClick={() => deleteComment(nestedComment.id)}
+                  className="ml-2 text-red-400 hover:underline"
+                >
+                  Delete
+                </button>
+              ) : null}
             </div>
             {replyingTo === nestedComment.id && (
               <div className="mt-2 ml-6">
@@ -199,12 +201,14 @@ const PostPage = ({ params }: { params: Params }) => {
             >
               Reply
             </button>
-            <button
-              onClick={() => deleteComment(comment.id)}
-              className="ml-2 text-red-400 hover:underline"
-            >
-              Delete
-            </button>
+            {session?.user?.id === comment.user_id || session?.user?.id === post?.user_id ? (
+              <button
+                onClick={() => deleteComment(comment.id)}
+                className="ml-2 text-red-400 hover:underline"
+              >
+                Delete
+              </button>
+            ) : null}
           </div>
           {replyingTo === comment.id && (
             <div className="mt-2 ml-6">
